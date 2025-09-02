@@ -1,0 +1,191 @@
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk   # pip install pillow
+import mysql.connector
+import subprocess
+
+# ---------------- DATABASE FUNCTIONS ---------------- #
+def register_user(username, password):
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="root",
+            database="sign"
+        )
+        cursor = db.cursor()
+        query = "INSERT INTO login_info (username, password) VALUES (%s, %s)"
+        cursor.execute(query, (username, password))
+        db.commit()
+        cursor.close()
+        db.close()
+
+        messagebox.showinfo("Success", "User registered successfully!")
+        subprocess.Popen(["python", "Home.py"])
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error: {err}")
+
+def verify_user(username, password):
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="root",
+            database="sign"
+        )
+        cursor = db.cursor()
+        query = "SELECT * FROM login_info WHERE username = %s AND password = %s"
+        cursor.execute(query, (username, password))
+        result = cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if result:
+            messagebox.showinfo("Login Success", "Welcome back!")
+            root.destroy()
+            subprocess.Popen(["python", "Home.py"])
+        else:
+            messagebox.showerror("Login Failed", "Invalid username or password.")
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error: {err}")
+
+# ---------------- FORM HANDLERS ---------------- #
+def submit_register():
+    username = entry_username.get()
+    password = entry_password.get()
+    if username and password:
+        register_user(username, password)
+    else:
+        messagebox.showwarning("Input Error", "Please fill both fields.")
+
+def submit_login():
+    username = entry_username.get()
+    password = entry_password.get()
+    if username and password:
+        verify_user(username, password)
+    else:
+        messagebox.showwarning("Input Error", "Please fill both fields.")
+
+def show_register():
+    clear_form()
+    label_username.pack(pady=5)
+    entry_username.pack(pady=5)
+    label_password.pack(pady=5)
+    entry_password.pack(pady=5)
+    submit_button_register.pack(pady=10)
+
+def show_login():
+    clear_form()
+    label_username.pack(pady=5)
+    entry_username.pack(pady=5)
+    label_password.pack(pady=5)
+    entry_password.pack(pady=5)
+    submit_button_login.pack(pady=10)
+
+def clear_form():
+    label_username.pack_forget()
+    entry_username.pack_forget()
+    label_password.pack_forget()
+    entry_password.pack_forget()
+    submit_button_register.pack_forget()
+    submit_button_login.pack_forget()
+
+# ---------------- UI SETUP ---------------- #
+root = tk.Tk()
+root.title("Sign Language Translator - Login/Register")
+root.geometry("700x550")
+root.configure(bg="#f3f4f6")
+
+# Main container frame (card style)
+main_frame = tk.Frame(root, bg="white", bd=0, relief="flat")
+main_frame.place(relx=0.5, rely=0.5, anchor="center", width=500, height=450)
+
+# ---- Top Banner with Image ----
+try:
+    img = Image.open("face.png")   # Put an image like a face/logo here
+    img = img.resize((80, 80))
+    img = ImageTk.PhotoImage(img)
+    img_label = tk.Label(main_frame, image=img, bg="white")
+    img_label.image = img
+    img_label.pack(pady=(20, 10))
+except:
+    pass  # If image not found, skip
+
+# Title
+label_welcome = tk.Label(
+    main_frame,
+    text="Welcome to Sign Translator",
+    font=("Helvetica", 18, "bold"),
+    bg="white",
+    fg="#1e3a8a"
+)
+label_welcome.pack(pady=(5, 10))
+
+# Subtitle
+label_subtitle = tk.Label(
+    main_frame,
+    text="Login or Register to Continue",
+    font=("Helvetica", 12),
+    bg="white",
+    fg="#475569"
+)
+label_subtitle.pack(pady=(0, 15))
+
+# Buttons for choosing mode
+new_user_button = tk.Button(
+    main_frame, text="🆕 New User",
+    font=("Helvetica", 12, "bold"),
+    bg="#3b82f6", fg="white",
+    activebackground="#2563eb",
+    relief="flat", width=20, height=2,
+    command=show_register
+)
+new_user_button.pack(pady=8)
+
+existing_user_button = tk.Button(
+    main_frame, text="🔑 Existing User",
+    font=("Helvetica", 12, "bold"),
+    bg="#3b82f6", fg="white",
+    activebackground="#2563eb",
+    relief="flat", width=20, height=2,
+    command=show_login
+)
+existing_user_button.pack(pady=8)
+
+# Username and Password inputs (hidden until login/register selected)
+label_username = tk.Label(main_frame, text="Username:", font=("Helvetica", 11, "bold"), bg="white", fg="#1f2937")
+entry_username = tk.Entry(main_frame, font=("Helvetica", 12), width=25, bd=1, relief="solid")
+
+label_password = tk.Label(main_frame, text="Password:", font=("Helvetica", 11, "bold"), bg="white", fg="#1f2937")
+entry_password = tk.Entry(main_frame, show="*", font=("Helvetica", 12), width=25, bd=1, relief="solid")
+
+# Buttons to submit login/register
+submit_button_register = tk.Button(
+    main_frame, text="Register",
+    font=("Helvetica", 12, "bold"),
+    bg="#10b981", fg="white",
+    activebackground="#059669",
+    relief="flat", width=15, height=1,
+    command=submit_register
+)
+
+submit_button_login = tk.Button(
+    main_frame, text="Login",
+    font=("Helvetica", 12, "bold"),
+    bg="#10b981", fg="white",
+    activebackground="#059669",
+    relief="flat", width=15, height=1,
+    command=submit_login
+)
+
+# Footer
+label_footer = tk.Label(
+    root,
+    text="© 2025 | Sign Translator | Powered by Tkinter",
+    font=("Helvetica", 9),
+    bg="#f3f4f6",
+    fg="#6b7280"
+)
+label_footer.pack(side="bottom", pady=12)
+
+root.mainloop()
