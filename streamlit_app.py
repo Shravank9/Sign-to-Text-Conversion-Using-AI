@@ -1,10 +1,12 @@
 import streamlit as st
-from deep_translator import GoogleTranslator
+from googletrans import Translator
 
 st.set_page_config(
     page_title="Sign To Text And Vice Versa",
     layout="wide"
 )
+
+translator = Translator()
 
 st.title("Sign To Text And Vice Versa Using AI")
 
@@ -35,7 +37,6 @@ if uploaded_image is not None:
         "Hand Sign Processed Successfully"
     )
 
-    # Demo Prediction
     predicted_text = "HELLO"
 
     st.subheader("Predicted Text")
@@ -54,11 +55,17 @@ user_text = st.text_area(
 
 if st.button("Convert Text To Sign"):
 
-    # Auto Translate To English
-    translated = GoogleTranslator(
-        source='auto',
-        target='en'
-    ).translate(user_text)
+    try:
+
+        # Auto Translate To English
+        translated = translator.translate(
+            user_text,
+            dest='en'
+        ).text
+
+    except:
+
+        translated = user_text
 
     translated = translated.strip()
 
@@ -132,10 +139,16 @@ voice_text = st.text_area(
 
 if st.button("Generate Voice Signs"):
 
-    translated_voice = GoogleTranslator(
-        source='auto',
-        target='en'
-    ).translate(voice_text)
+    try:
+
+        translated_voice = translator.translate(
+            voice_text,
+            dest='en'
+        ).text
+
+    except:
+
+        translated_voice = voice_text
 
     translated_voice = translated_voice.strip()
 
