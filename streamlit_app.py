@@ -9,7 +9,7 @@ st.set_page_config(
 st.title("Sign To Text And Vice Versa Using AI")
 
 st.write(
-    "AI Based Multi Language Sign Communication System"
+    "AI Based Multi Language Communication System"
 )
 
 # =========================================
@@ -20,7 +20,7 @@ st.header("Sign To Text Conversion")
 
 uploaded_image = st.file_uploader(
     "Upload Hand Sign Image",
-    type=["jpg", "png", "jpeg"]
+    type=["jpg", "jpeg", "png"]
 )
 
 if uploaded_image is not None:
@@ -28,10 +28,12 @@ if uploaded_image is not None:
     st.image(
         uploaded_image,
         width=300,
-        caption="Uploaded Hand Sign"
+        caption="Uploaded Sign Image"
     )
 
-    st.success("Hand Sign Processed Successfully")
+    st.success(
+        "Hand Sign Processed Successfully"
+    )
 
     # Dummy AI Prediction
     predicted_text = "HELLO"
@@ -41,7 +43,7 @@ if uploaded_image is not None:
     st.success(predicted_text)
 
 # =========================================
-# TEXT / VOICE TO SIGN SECTION
+# TEXT / VOICE TO SIGN
 # =========================================
 
 st.header("Text / Voice To Sign Conversion")
@@ -61,7 +63,10 @@ user_text = st.text_area(
 
 if st.button("Convert To Sign"):
 
-    # Translate into English
+    # =====================================
+    # TRANSLATION
+    # =====================================
+
     if language == "Telugu":
 
         translated = GoogleTranslator(
@@ -80,90 +85,128 @@ if st.button("Convert To Sign"):
 
         translated = user_text
 
+    translated = translated.strip()
+
     st.subheader("Translated English Text")
 
     st.success(translated)
 
+    # =====================================
+    # SIGN IMAGE GENERATION
+    # =====================================
+
     st.subheader("Generated Sign Images")
 
-    letters = []
+    words = translated.split()
 
-    for char in translated.upper():
+    for word in words:
 
-        if char.isalpha():
+        word = word.strip()
 
-            letters.append(char)
+        try:
 
-    cols = st.columns(
-        min(len(letters), 8)
-    )
+            # FIRST TRY FULL WORD IMAGE
+            st.image(
+                f"Images/{word.capitalize()}.jpg",
+                width=250,
+                caption=f"Sign Word: {word}"
+            )
 
-    index = 0
+        except:
 
-    for char in letters:
+            # OTHERWISE LETTER BY LETTER
+            st.write(f"Letter Signs For: {word}")
 
-        with cols[index % 8]:
+            cols = st.columns(
+                min(len(word), 8)
+            )
 
-            try:
+            idx = 0
 
-                st.image(
-                    f"Images/{char.lower()}.png",
-                    width=120,
-                    caption=f"Sign {char}"
-                )
+            for char in word.upper():
 
-            except:
+                if char.isalpha():
 
-                st.warning(
-                    f"No image found for {char}"
-                )
+                    try:
 
-        index += 1
+                        with cols[idx % 8]:
+
+                            st.image(
+                                f"Images/{char}.jpg",
+                                width=120,
+                                caption=char
+                            )
+
+                    except:
+
+                        st.warning(
+                            f"No image found for {char}"
+                        )
+
+                    idx += 1
 
 # =========================================
-# VOICE INPUT SECTION
+# VOICE INPUT DEMO
 # =========================================
 
 st.header("Voice Input Demo")
 
 voice_text = st.text_input(
-    "Paste Converted Voice Text"
+    "Paste Voice Converted Text"
 )
 
 if st.button("Generate Voice Signs"):
 
-    st.success("Voice Converted Successfully")
+    voice_text = voice_text.strip()
 
-    cols2 = st.columns(
-        min(len(voice_text), 8)
+    st.success(
+        "Voice Converted Successfully"
     )
 
-    idx = 0
+    words = voice_text.split()
 
-    for char in voice_text.upper():
+    for word in words:
 
-        if char.isalpha():
+        try:
 
-            with cols2[idx % 8]:
+            st.image(
+                f"Images/{word.capitalize()}.jpg",
+                width=250,
+                caption=f"Voice Sign Word: {word}"
+            )
 
-                try:
+        except:
 
-                    st.image(
-                        f"Images/{char.lower()}.png",
-                        width=120,
-                        caption=f"Sign {char}"
-                    )
+            cols2 = st.columns(
+                min(len(word), 8)
+            )
 
-                except:
+            idx2 = 0
 
-                    st.warning(
-                        f"No image found for {char}"
-                    )
+            for char in word.upper():
 
-            idx += 1
+                if char.isalpha():
+
+                    try:
+
+                        with cols2[idx2 % 8]:
+
+                            st.image(
+                                f"Images/{char}.jpg",
+                                width=120,
+                                caption=char
+                            )
+
+                    except:
+
+                        st.warning(
+                            f"No image found for {char}"
+                        )
+
+                    idx2 += 1
 
 # =========================================
-# PROJECT FEATURES
+# FEATURES
 # =========================================
 
 st.header("Project Features")
@@ -172,10 +215,11 @@ st.write("""
 ✅ Sign To Text Conversion  
 ✅ Text To Sign Conversion  
 ✅ Voice To Sign Conversion  
-✅ Multi Language Support  
-✅ English Support  
-✅ Telugu Support  
-✅ Hindi Support  
-✅ AI Based Communication  
-✅ Real Sign Language Image Generation  
+✅ English Language Support  
+✅ Telugu Language Support  
+✅ Hindi Language Support  
+✅ AI Based Communication System  
+✅ Full Word Sign Detection  
+✅ Letter Based Sign Generation  
+✅ Real Sign Image Matching  
 """)
