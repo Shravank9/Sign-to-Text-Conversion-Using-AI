@@ -1,5 +1,6 @@
 import streamlit as st
 from deep_translator import GoogleTranslator
+import speech_recognition as sr
 
 st.set_page_config(
     page_title="Sign To Text And Vice Versa",
@@ -43,10 +44,10 @@ if uploaded_image is not None:
     st.success(predicted_text)
 
 # =========================================
-# TEXT / VOICE TO SIGN
+# TEXT TO SIGN SECTION
 # =========================================
 
-st.header("Text / Voice To Sign Conversion")
+st.header("Text To Sign Conversion")
 
 language = st.selectbox(
     "Select Input Language",
@@ -58,15 +59,12 @@ language = st.selectbox(
 )
 
 user_text = st.text_area(
-    "Enter Text / Voice Output"
+    "Enter Text"
 )
 
-if st.button("Convert To Sign"):
+if st.button("Convert Text To Sign"):
 
-    # =====================================
-    # TRANSLATION
-    # =====================================
-
+    # Translate to English
     if language == "Telugu":
 
         translated = GoogleTranslator(
@@ -91,10 +89,6 @@ if st.button("Convert To Sign"):
 
     st.success(translated)
 
-    # =====================================
-    # SIGN IMAGE GENERATION
-    # =====================================
-
     st.subheader("Generated Sign Images")
 
     words = translated.split()
@@ -105,7 +99,7 @@ if st.button("Convert To Sign"):
 
         try:
 
-            # FIRST TRY FULL WORD IMAGE
+            # Try full word image first
             st.image(
                 f"Images/{word.capitalize()}.jpg",
                 width=250,
@@ -114,7 +108,7 @@ if st.button("Convert To Sign"):
 
         except:
 
-            # OTHERWISE LETTER BY LETTER
+            # Letter images
             st.write(f"Letter Signs For: {word}")
 
             cols = st.columns(
@@ -146,80 +140,130 @@ if st.button("Convert To Sign"):
                     idx += 1
 
 # =========================================
-# VOICE INPUT DEMO
+# VOICE TO SIGN SECTION
 # =========================================
 
-st.header("Voice Input Demo")
+st.header("Voice To Sign Conversion")
 
-voice_text = st.text_input(
-    "Paste Voice Converted Text"
+voice_language = st.selectbox(
+    "Select Voice Language",
+    [
+        "English",
+        "Telugu",
+        "Hindi"
+    ]
 )
 
-if st.button("Generate Voice Signs"):
+if st.button("Start Voice Recording"):
 
-    voice_text = voice_text.strip()
+    recognizer = sr.Recognizer()
 
-    st.success(
-        "Voice Converted Successfully"
-    )
+    try:
 
-    words = voice_text.split()
+        with sr.Microphone() as source:
 
-    for word in words:
+            st.info("Speak Now...")
 
-        try:
-
-            st.image(
-                f"Images/{word.capitalize()}.jpg",
-                width=250,
-                caption=f"Voice Sign Word: {word}"
+            audio = recognizer.listen(
+                source,
+                timeout=5
             )
 
-        except:
-
-            cols2 = st.columns(
-                min(len(word), 8)
+            st.success(
+                "Voice Recorded Successfully"
             )
 
-            idx2 = 0
+            # Language Codes
+            lang_code = "en-IN"
 
-            for char in word.upper():
+            if voice_language == "Telugu":
+                lang_code = "te-IN"
 
-                if char.isalpha():
+            elif voice_language == "Hindi":
+                lang_code = "hi-IN"
 
-                    try:
+            # Speech Recognition
+            voice_text = recognizer.recognize_google(
+                audio,
+                language=lang_code
+            )
 
-                        with cols2[idx2 % 8]:
+            st.subheader("Recognized Text")
 
-                            st.image(
-                                f"Images/{char}.jpg",
-                                width=120,
-                                caption=char
-                            )
+            st.success(voice_text)
 
-                    except:
+            # Translate to English
+            if voice_language == "Telugu":
 
-                        st.warning(
-                            f"No image found for {char}"
-                        )
+                translated_voice = GoogleTranslator(
+                    source='te',
+                    target='en'
+                ).translate(voice_text)
 
-                    idx2 += 1
+            elif voice_language == "Hindi":
 
-# =========================================
-# FEATURES
-# =========================================
+                translated_voice = GoogleTranslator(
+                    source='hi',
+                    target='en'
+                ).translate(voice_text)
 
-st.header("Project Features")
+            else:
 
-st.write("""
-✅ Sign To Text Conversion  
-✅ Text To Sign Conversion  
-✅ Voice To Sign Conversion  
-✅ English Language Support  
-✅ Telugu Language Support  
-✅ Hindi Language Support  
-✅ AI Based Communication System  
-✅ Full Word Sign Detection  
-✅ Letter Based Sign Generation  
-✅ Real Sign Image Matching  
-""")
+                translated_voice = voice_text
+
+            st.subheader("Translated English Text")
+
+            st.success(translated_voice)
+
+            st.subheader("Generated Sign Images")
+
+            words = translated_voice.split()
+
+            for word in words:
+
+                try:
+
+                    # Full word image
+                    st.image(
+                        f"Images/{word.capitalize()}.jpg",
+                        width=250,
+                        caption=f"Sign Word: {word}"
+                    )
+
+                except:
+
+                    # Letter images
+                    cols2 = st.columns(
+                        min(len(word), 8)
+                    )
+
+                    idx2 = 0
+
+                    for char in word.upper():
+
+                        if char.isalpha():
+
+                            try:
+
+                                with cols2[idx2 % 8]:
+
+                                    st.image(
+                                        f"Images/{char}.jpg",
+                                        width=120,
+                                        caption=char
+                                    )
+
+                            except:
+
+                                st.warning(
+                                    f"No image found for {char}"
+                                )
+
+                            idx2 += 1
+
+    except Exception as e:
+
+        st.error(
+            f"Voice Recognition Error: {e}"
+        )
+
