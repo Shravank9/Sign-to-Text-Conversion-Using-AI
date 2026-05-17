@@ -35,7 +35,7 @@ if uploaded_image is not None:
         "Hand Sign Processed Successfully"
     )
 
-    # Dummy Prediction
+    # Demo Prediction
     predicted_text = "HELLO"
 
     st.subheader("Predicted Text")
@@ -48,39 +48,17 @@ if uploaded_image is not None:
 
 st.header("Text To Sign Conversion")
 
-language = st.selectbox(
-    "Select Input Language",
-    [
-        "English",
-        "Telugu",
-        "Hindi"
-    ]
-)
-
 user_text = st.text_area(
-    "Enter Text"
+    "Enter Text In Any Language"
 )
 
 if st.button("Convert Text To Sign"):
 
-    # Translate into English
-    if language == "Telugu":
-
-        translated = GoogleTranslator(
-            source='te',
-            target='en'
-        ).translate(user_text)
-
-    elif language == "Hindi":
-
-        translated = GoogleTranslator(
-            source='hi',
-            target='en'
-        ).translate(user_text)
-
-    else:
-
-        translated = user_text
+    # Auto Translate To English
+    translated = GoogleTranslator(
+        source='auto',
+        target='en'
+    ).translate(user_text)
 
     translated = translated.strip()
 
@@ -98,7 +76,7 @@ if st.button("Convert Text To Sign"):
 
         try:
 
-            # Full word image
+            # Full Word Image
             st.image(
                 f"Images/{word.capitalize()}.jpg",
                 width=250,
@@ -107,7 +85,7 @@ if st.button("Convert Text To Sign"):
 
         except:
 
-            # Letter images
+            # Letter Images
             st.write(f"Letter Signs For: {word}")
 
             cols = st.columns(
@@ -144,13 +122,8 @@ if st.button("Convert Text To Sign"):
 
 st.header("Voice To Sign Conversion")
 
-voice_language = st.selectbox(
-    "Select Voice Language",
-    [
-        "English",
-        "Telugu",
-        "Hindi"
-    ]
+st.caption(
+    "Cloud demo uses converted voice text input."
 )
 
 voice_text = st.text_area(
@@ -159,24 +132,12 @@ voice_text = st.text_area(
 
 if st.button("Generate Voice Signs"):
 
-    # Translate to English
-    if voice_language == "Telugu":
+    translated_voice = GoogleTranslator(
+        source='auto',
+        target='en'
+    ).translate(voice_text)
 
-        translated_voice = GoogleTranslator(
-            source='te',
-            target='en'
-        ).translate(voice_text)
-
-    elif voice_language == "Hindi":
-
-        translated_voice = GoogleTranslator(
-            source='hi',
-            target='en'
-        ).translate(voice_text)
-
-    else:
-
-        translated_voice = voice_text
+    translated_voice = translated_voice.strip()
 
     st.subheader("Translated English Text")
 
@@ -190,7 +151,7 @@ if st.button("Generate Voice Signs"):
 
         try:
 
-            # Full word image
+            # Full Word Image
             st.image(
                 f"Images/{word.capitalize()}.jpg",
                 width=250,
@@ -199,7 +160,7 @@ if st.button("Generate Voice Signs"):
 
         except:
 
-            # Letter images
+            # Letter Images
             cols = st.columns(
                 min(len(word), 8)
             )
