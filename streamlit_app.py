@@ -1,12 +1,10 @@
 import streamlit as st
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
 st.set_page_config(
     page_title="Sign To Text And Vice Versa",
     layout="wide"
 )
-
-translator = Translator()
 
 st.title("Sign To Text And Vice Versa Using AI")
 
@@ -37,6 +35,7 @@ if uploaded_image is not None:
         "Hand Sign Processed Successfully"
     )
 
+    # Demo Prediction
     predicted_text = "HELLO"
 
     st.subheader("Predicted Text")
@@ -49,6 +48,10 @@ if uploaded_image is not None:
 
 st.header("Text To Sign Conversion")
 
+st.caption(
+    "Supports English, Telugu, Hindi and other languages using auto translation."
+)
+
 user_text = st.text_area(
     "Enter Text In Any Language"
 )
@@ -57,11 +60,10 @@ if st.button("Convert Text To Sign"):
 
     try:
 
-        # Auto Translate To English
-        translated = translator.translate(
-            user_text,
-            dest='en'
-        ).text
+        translated = GoogleTranslator(
+            source='auto',
+            target='en'
+        ).translate(user_text)
 
     except:
 
@@ -81,9 +83,9 @@ if st.button("Convert Text To Sign"):
 
         word = word.strip()
 
+        # Try Full Word Image
         try:
 
-            # Full Word Image
             st.image(
                 f"Images/{word.capitalize()}.jpg",
                 width=250,
@@ -92,7 +94,7 @@ if st.button("Convert Text To Sign"):
 
         except:
 
-            # Letter Images
+            # Letter Based Images
             st.write(f"Letter Signs For: {word}")
 
             cols = st.columns(
@@ -141,10 +143,10 @@ if st.button("Generate Voice Signs"):
 
     try:
 
-        translated_voice = translator.translate(
-            voice_text,
-            dest='en'
-        ).text
+        translated_voice = GoogleTranslator(
+            source='auto',
+            target='en'
+        ).translate(voice_text)
 
     except:
 
