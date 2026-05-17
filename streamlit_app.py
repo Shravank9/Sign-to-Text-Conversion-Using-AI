@@ -84,7 +84,7 @@ if st.button("Convert To Sign"):
 
     st.success(translated)
 
-    st.subheader("Generated Sign Letters")
+    st.subheader("Generated Sign Images")
 
     letters = []
 
@@ -104,10 +104,19 @@ if st.button("Convert To Sign"):
 
         with cols[index % 8]:
 
-            st.image(
-                f"https://dummyimage.com/100x100/000/fff&text={char}",
-                caption=f"Sign {char}"
-            )
+            try:
+
+                st.image(
+                    f"Images/{char.lower()}.png",
+                    width=120,
+                    caption=f"Sign {char}"
+                )
+
+            except:
+
+                st.warning(
+                    f"No image found for {char}"
+                )
 
         index += 1
 
@@ -137,15 +146,24 @@ if st.button("Generate Voice Signs"):
 
             with cols2[idx % 8]:
 
-                st.image(
-                    f"https://dummyimage.com/100x100/111/fff&text={char}",
-                    caption=char
-                )
+                try:
+
+                    st.image(
+                        f"Images/{char.lower()}.png",
+                        width=120,
+                        caption=f"Sign {char}"
+                    )
+
+                except:
+
+                    st.warning(
+                        f"No image found for {char}"
+                    )
 
             idx += 1
 
 # =========================================
-# PROJECT DETAILS
+# PROJECT FEATURES
 # =========================================
 
 st.header("Project Features")
@@ -159,4 +177,5 @@ st.write("""
 ✅ Telugu Support  
 ✅ Hindi Support  
 ✅ AI Based Communication  
+✅ Real Sign Language Image Generation  
 """)
